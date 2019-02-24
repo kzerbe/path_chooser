@@ -7,9 +7,14 @@ export interface PathItem {
   label: string;
   value: string;
   hidden: boolean;
-  dependsOn?: number;
   listItems: Observable<string[]>;
 }
+
+export interface Choice {
+  itemIndex: number;
+  value: string;
+}
+
 
 const PathItems: PathItem[] = [
   {label: 'Interfaces', value: '', hidden: false,
@@ -42,10 +47,22 @@ const PathItems2: PathItem[] = [
 @Injectable()
 export class PathService {
   get pathStreamItems() {
-    return PathItems;
+    let pathItems = PathItems;
+    return this.hideDependend(pathItems, 0);
   }
 
   get animals() {
     return PathItems2;
+  }
+
+  hideDependend(items: PathItem[], start: number): PathItem[]  {
+    items[start].hidden = false;
+    items[start].value = '';
+
+    for (let idx: number = ++start; idx < items.length; ++idx) {
+      items[idx].hidden = true;
+    }
+
+    return items;
   }
 }

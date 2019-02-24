@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {PathItem} from './path-service';
+import {Component, EventEmitter, Input, Output, OnInit} from '@angular/core';
+import {PathItem, Choice} from './path-service';
 
 
 @Component({
@@ -10,7 +10,7 @@ import {PathItem} from './path-service';
           <div *ngIf="!item.hidden" class="form-group">
             <label>{{item.label}}
               <select [value]="item.value" class="form-control-sm" (change)="onSelection($event.target.value, idx)">
-                <option value="" disabled>Select</option>
+                <option value="">Select</option>
                 <option *ngFor="let option of item.listItems | async" [value]="option">
                   {{option}}
                 </option>
@@ -22,12 +22,21 @@ import {PathItem} from './path-service';
     </fieldset>`,
   styles: ['.col-xs-4 {width: 120px}']
 })
-export class PathChooserComponent {
+export class PathChooserComponent implements OnInit{
   @Input() pathItems: PathItem[];
-  @Input() preSelected: string[];
-  @Output() chosen = new EventEmitter<{itemIdx, value}>();
+  @Input() update: Choice;
+  @Output() chosen = new EventEmitter<Choice>();
+  @Output() path$ = new EventEmitter<string[]>();
+  path: string[] = [];
+
+  ngOnInit() {
+    this.path = this.pathItems.map(item => item.value);
+  }
+
 
   onSelection(value: string, idx: number) {
-    this.chosen.next({itemIdx: idx, value: value});
+    this.chosen.next({itemIndex: idx, value: value});
+    this.path[idx] = value;
+    this.path$.next(this.path);
   }
 }

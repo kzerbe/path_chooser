@@ -1,10 +1,5 @@
-import { Component } from '@angular/core';
-import {PathItem, PathService} from './path-service';
-
-interface Choice {
-  itemIndex: number;
-  value: string;
-}
+import {Component} from '@angular/core';
+import {PathItem, PathService, Choice} from './path-service';
 
 @Component({
   selector: 'app-root',
@@ -15,12 +10,13 @@ interface Choice {
       </div>
       <div class="card-body">
         <h4>Select Source</h4>
-        <path-chooser [pathItems]="streams" (chosen)="onChosen('source', $event)"></path-chooser>
+        <path-chooser [pathItems]="streams" (chosen)="onChosen('streams', $event)" (path)="onPath($event)"></path-chooser>
         <h4>Select Animal</h4>
-        <path-chooser [pathItems]="animals" (chosen)="onChosen('species', $event)"></path-chooser>
+        <path-chooser [pathItems]="species" (chosen)="onChosen('species', $event)"></path-chooser>
       </div>
       <div class="card-footer">
-        <span>{{topic}}:&nbsp;{{choice | json}}</span>
+        <p>{{topic}}:&nbsp;{{choice | json}}</p>
+        <p>Path {{path}}</p>
       </div>
     </div>
     
@@ -29,18 +25,26 @@ interface Choice {
 })
 export class AppComponent {
   streams: PathItem[];
-  animals: PathItem[];
+  species: PathItem[];
   choice: Choice;
   topic: string;
+  path: string;
 
   constructor(private pathService: PathService) {
     this.streams = this.pathService.pathStreamItems;
-    this.animals = this.pathService.animals;
+    this.species = this.pathService.animals;
   }
 
-  onChosen(topic: string, choice: Choice)
-  {
+  onChosen(topic: string, choice: Choice) {
     this.topic = topic;
     this.choice = choice;
+    if (topic === 'streams') {
+      this.pathService.hideDependend(this.streams, choice.itemIndex + 1);
+    }
   }
+
+  onPath(path: string[]) {
+    this.path = path.join('.');
+  }
+
 }

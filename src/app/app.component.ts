@@ -1,6 +1,11 @@
 import { Component } from '@angular/core';
 import {PathItem, PathService} from './path-service';
 
+interface Choice {
+  itemIndex: number;
+  value: string;
+}
+
 @Component({
   selector: 'app-root',
   template: `<div class="container-fluid">
@@ -10,9 +15,12 @@ import {PathItem, PathService} from './path-service';
       </div>
       <div class="card-body">
         <h4>Select Source</h4>
-        <path-chooser [pathItems]="streams"></path-chooser>
-        <h4>Select Destination</h4>
-        <path-chooser [pathItems]="animals"></path-chooser>
+        <path-chooser [pathItems]="streams" (chosen)="onChosen('source', $event)"></path-chooser>
+        <h4>Select Animal</h4>
+        <path-chooser [pathItems]="animals" (chosen)="onChosen('species', $event)"></path-chooser>
+      </div>
+      <div class="card-footer">
+        <span>{{topic}}:&nbsp;{{choice | json}}</span>
       </div>
     </div>
     
@@ -22,9 +30,17 @@ import {PathItem, PathService} from './path-service';
 export class AppComponent {
   streams: PathItem[];
   animals: PathItem[];
+  choice: Choice;
+  topic: string;
 
   constructor(private pathService: PathService) {
     this.streams = this.pathService.pathStreamItems;
     this.animals = this.pathService.animals;
+  }
+
+  onChosen(topic: string, choice: Choice)
+  {
+    this.topic = topic;
+    this.choice = choice;
   }
 }

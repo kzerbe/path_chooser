@@ -1,7 +1,20 @@
 import {Injectable} from '@angular/core';
 import {Observable, of, range} from 'rxjs';
-import {map, toArray} from 'rxjs/operators';
+import {map, mapTo, toArray} from 'rxjs/operators';
 
+export enum Mode {
+  one = 1,
+  two,
+  three,
+  four
+}
+
+interface Pair {
+  key: Mode;
+  value: string;
+}
+
+export const Modes = range(1, 4).pipe(map(m =>  m as Mode), toArray());
 
 export interface PathItem {
   label: string;
